@@ -1,0 +1,11 @@
+{
+    "name": "RRHH",
+    "alias": "rrhh",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\RRHH\\App\\Providers\\RRHHServiceProvider"
+    ],
+    "files": []
+}
