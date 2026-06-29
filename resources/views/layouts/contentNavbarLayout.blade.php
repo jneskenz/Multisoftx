@@ -29,7 +29,6 @@
           <!-- Content -->
           <div class="{{ $containerNav }} flex-grow-1 container-p-y">
             @yield('content')
-            {{ $slot ?? '' }}
           </div>
           <!-- / Content -->
 

@@ -39,27 +39,28 @@ new class extends Component {
 
         $invitation->delete();
 
-        $this->dispatch('close-modal', name: $this->modalName);
-
         Flux::toast(variant: 'success', text: __('Invitation cancelled.'));
 
         $this->redirectRoute('teams.edit', ['team' => $this->team->slug], navigate: true);
     }
 }; ?>
 
-<flux:modal :name="$modalName" focusable class="max-w-lg">
-    <form wire:submit="cancelInvitation" class="space-y-6">
-        <div>
-            <flux:heading size="lg">{{ __('Cancel invitation') }}</flux:heading>
-            <flux:subheading>
-                {{ __('Are you sure you want to cancel the invitation for :email?', ['email' => $invitationEmail]) }}
-            </flux:subheading>
+<div class="modal fade" id="{{ $modalName }}" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form wire:submit="cancelInvitation">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Cancel invitation') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">{{ __('Are you sure you want to cancel the invitation for :email?', ['email' => $invitationEmail]) }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Keep invitation') }}</button>
+                    <button type="submit" class="btn btn-danger" data-test="cancel-invitation-confirm">{{ __('Cancel invitation') }}</button>
+                </div>
+            </form>
         </div>
-        <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-            <flux:modal.close>
-                <flux:button variant="filled">{{ __('Keep invitation') }}</flux:button>
-            </flux:modal.close>
-            <flux:button variant="danger" type="submit" data-test="cancel-invitation-confirm">{{ __('Cancel invitation') }}</flux:button>
-        </div>
-    </form>
-</flux:modal>
+    </div>
+</div>

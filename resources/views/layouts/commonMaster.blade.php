@@ -101,6 +101,19 @@
   <!-- Livewire Scripts -->
   @livewireScripts
 
+  <script>
+    document.addEventListener('livewire:navigated', () => {
+      // Reinitialize Bootstrap dropdowns, tooltips, etc. after Livewire SPA navigation
+      document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(el => {
+        if (!el.classList.contains('dropdown-toggle')) return;
+        try { new bootstrap.Dropdown(el); } catch (e) {}
+      });
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        try { new bootstrap.Tooltip(el); } catch (e) {}
+      });
+    });
+  </script>
+
 </body>
 
 </html>

@@ -76,26 +76,29 @@ new class extends Component {
     }
 }; ?>
 
-<flux:modal name="delete-team" :show="$errors->isNotEmpty()" focusable class="max-w-lg">
-    <form wire:submit="deleteTeam" class="space-y-6">
-        <div>
-            <flux:heading size="lg">{{ __('Are you sure?') }}</flux:heading>
-            <flux:subheading>
-                {{ __('This action cannot be undone. This will permanently delete the team ":name".', ['name' => $team->name]) }}
-            </flux:subheading>
+<div class="modal fade" id="delete-team-modal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form wire:submit="deleteTeam">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Are you sure?') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger mb-3">
+                        <p class="mb-0">{{ __('This action cannot be undone. This will permanently delete the team ":name".', ['name' => $team->name]) }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="delete-team-name" class="form-label">{{ $this->deleteConfirmLabel }}</label>
+                        <input type="text" id="delete-team-name" class="form-control" wire:model="deleteName" required data-test="delete-team-name" />
+                        @error('deleteName') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger" data-test="delete-team-confirm">{{ __('Delete team') }}</button>
+                </div>
+            </form>
         </div>
-
-        <div class="space-y-4">
-            <flux:input wire:model="deleteName" :label="$this->deleteConfirmLabel" required data-test="delete-team-name" />
-        </div>
-
-        <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-            <flux:modal.close>
-                <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
-            </flux:modal.close>
-            <flux:button variant="danger" type="submit" data-test="delete-team-confirm">
-                {{ __('Delete team') }}
-            </flux:button>
-        </div>
-    </form>
-</flux:modal>
+    </div>
+</div>

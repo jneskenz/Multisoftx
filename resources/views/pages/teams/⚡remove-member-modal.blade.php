@@ -46,27 +46,28 @@ new class extends Component {
             $user->switchTeam($user->personalTeam());
         }
 
-        $this->dispatch('close-modal', name: $this->modalName);
-
         Flux::toast(variant: 'success', text: __('Member removed.'));
 
         $this->redirectRoute('teams.edit', ['team' => $this->team->slug], navigate: true);
     }
 }; ?>
 
-<flux:modal :name="$modalName" focusable class="max-w-lg">
-    <form wire:submit="removeMember" class="space-y-6">
-        <div>
-            <flux:heading size="lg">{{ __('Remove team member') }}</flux:heading>
-            <flux:subheading>
-                {{ __('Are you sure you want to remove :name from this team?', ['name' => $memberName]) }}
-            </flux:subheading>
+<div class="modal fade" id="{{ $modalName }}" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form wire:submit="removeMember">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Remove team member') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">{{ __('Are you sure you want to remove :name from this team?', ['name' => $memberName]) }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger" data-test="remove-member-confirm">{{ __('Remove member') }}</button>
+                </div>
+            </form>
         </div>
-        <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-            <flux:modal.close>
-                <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
-            </flux:modal.close>
-            <flux:button variant="danger" type="submit" data-test="remove-member-confirm">{{ __('Remove member') }}</flux:button>
-        </div>
-    </form>
-</flux:modal>
+    </div>
+</div>

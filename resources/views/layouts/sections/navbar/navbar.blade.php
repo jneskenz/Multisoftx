@@ -10,16 +10,19 @@
     </a>
   </div>
 
-  <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
+  <div class="navbar-nav-right d-flex align-items-center justify-content-end gap-3" id="navbar-collapse">
+    @auth
+      <livewire:team-switcher />
+    @endauth
     <ul class="navbar-nav flex-row align-items-center ms-auto">
       @auth
-        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-          <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
+        <li x-data="{ open: false }" class="nav-item navbar-dropdown dropdown-user dropdown">
+          <a @click="open = !open" @click.away="open = false" class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" role="button">
             <div class="avatar avatar-online">
               <span class="avatar-initial rounded-circle bg-label-primary">{{ Auth::user()->initials() }}</span>
             </div>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end">
+          <ul x-show="open" x-transition class="dropdown-menu dropdown-menu-end show" style="position:absolute;">
             <li>
               <a class="dropdown-item" href="{{ $profileUrl }}">
                 <div class="d-flex">

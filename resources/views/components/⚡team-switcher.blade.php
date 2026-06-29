@@ -40,13 +40,13 @@ new class extends Component {
         $user->switchTeam($team);
 
         if (! request()->header('Referer')) {
-            $this->redirectRoute('dashboard', ['current_team' => $team->slug], navigate: true);
+            $this->redirectRoute('dashboard', ['current_team' => $team->slug], navigate: false);
 
             return;
         }
 
         if (! $currentTeamSlug) {
-            $this->redirect(request()->header('Referer'), navigate: true);
+            $this->redirect(request()->header('Referer'), navigate: false);
 
             return;
         }
@@ -57,7 +57,7 @@ new class extends Component {
             $team->slug,
         );
 
-        $this->redirect($redirectTo ?? request()->header('Referer'), navigate: true);
+        $this->redirect($redirectTo ?? request()->header('Referer'), navigate: false);
     }
 
     protected function replaceCurrentTeamInReferer(string $referer, string $currentTeamSlug, string $newTeamSlug): ?string
@@ -78,43 +78,32 @@ new class extends Component {
     }
 }; ?>
 
-<div>
-    <flux:dropdown position="bottom" align="start">
-        <flux:button variant="ghost" class="group w-full justify-start in-data-flux-sidebar-collapsed-desktop:justify-center" data-test="team-switcher-trigger">
-            <flux:icon name="users" class="hidden size-4 in-data-flux-sidebar-collapsed-desktop:block" />
-            <span class="truncate font-semibold in-data-flux-sidebar-collapsed-desktop:hidden">{{ $this->currentTeam()['name'] ?? __('Select team') }}</span>
-            <flux:icon
-                name="chevrons-up-down"
-                variant="micro"
-                class="ms-auto size-4 in-data-flux-sidebar-collapsed-desktop:hidden"
-            />
-        </flux:button>
-
-        <flux:menu class="min-w-56">
-            <flux:menu.heading>{{ __('Teams') }}</flux:menu.heading>
-
-            @foreach ($this->teams() as $team)
-                <flux:menu.item
+<div x-data="{ open: false }" class="dropdown d-inline-block" style="min-width:200px;">
+    <button @click="open = !open" @click.away="open = false" class="btn btn-outline-secondary dropdown-toggle w-100 d-flex align-items-center justify-content-between" type="button" data-test="team-switcher-trigger">
+        <span class="text-truncate">{{ $this->currentTeam()['name'] ?? __('Select team') }}</span>
+    </button>
+    <ul x-show="open" x-transition class="dropdown-menu w-100 show" style="position:absolute;inset:0 auto auto 0;margin:0;"
+        @click="open = false">
+        @foreach ($this->teams() as $team)
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center justify-content-between"
                     wire:click="switchTeam('{{ $team->slug }}')"
-                    class="cursor-pointer"
-                    data-test="team-switcher-item"
-                >
-                    <div class="flex w-full items-center justify-between">
-                        <span>{{ $team->name }}</span>
-                        @if ($team->isCurrent)
-                            <flux:icon name="check" class="size-4" />
-                        @endif
-                    </div>
-                </flux:menu.item>
-            @endforeach
-
-            <flux:menu.separator />
-
-            <flux:modal.trigger name="create-team-switcher">
-                <flux:menu.item icon="plus" class="cursor-pointer" data-test="team-switcher-new-team">
-                    {{ __('New team') }}
-                </flux:menu.item>
-            </flux:modal.trigger>
-        </flux:menu>
-    </flux:dropdown>
+                    data-test="team-switcher-item">
+                    <span>{{ $team->name }}</span>
+                    @if ($team->isCurrent)
+                        <i class="icon-base ti tabler-check text-primary"></i>
+                    @endif
+                </button>
+            </li>
+        @endforeach
+        @if (Route::has('teams.index'))
+            <li><hr class="dropdown-divider"></li>
+            <li>
+                <a href="{{ route('teams.index') }}" class="dropdown-item" wire:navigate>
+                    <i class="icon-base ti tabler-plus me-2"></i>
+                    {{ __('Manage teams') }}
+                </a>
+            </li>
+        @endif
+    </ul>
 </div>

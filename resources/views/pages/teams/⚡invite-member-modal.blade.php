@@ -44,7 +44,6 @@ new class extends Component {
             ->notify(new TeamInvitationNotification($invitation));
 
         $this->reset('inviteEmail', 'inviteRole');
-        $this->dispatch('close-modal', name: 'invite-member');
 
         Flux::toast(variant: 'success', text: __('Invitation sent.'));
 
@@ -58,28 +57,35 @@ new class extends Component {
     }
 }; ?>
 
-<flux:modal name="invite-member" :show="$errors->isNotEmpty()" focusable class="max-w-lg">
-    <form wire:submit="createInvitation" class="space-y-6">
-        <div>
-            <flux:heading size="lg">{{ __('Invite a team member') }}</flux:heading>
-            <flux:subheading>{{ __('Send an invitation to join this team.') }}</flux:subheading>
+<div class="modal fade" id="invite-member-modal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form wire:submit="createInvitation">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('Invite a team member') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="invite-email" class="form-label">{{ __('Email address') }}</label>
+                        <input type="email" id="invite-email" class="form-control" wire:model="inviteEmail" required data-test="invite-email" />
+                        @error('inviteEmail') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label for="invite-role" class="form-label">{{ __('Role') }}</label>
+                        <select id="invite-role" class="form-select" wire:model="inviteRole" data-test="invite-role">
+                            @foreach ($this->availableRoles as $role)
+                                <option value="{{ $role['value'] }}">{{ $role['label'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('inviteRole') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary" data-test="invite-submit">{{ __('Send invitation') }}</button>
+                </div>
+            </form>
         </div>
-
-        <div class="space-y-4">
-            <flux:input wire:model="inviteEmail" type="email" :label="__('Email address')" required data-test="invite-email" />
-
-            <flux:select wire:model="inviteRole" :label="__('Role')" data-test="invite-role">
-                @foreach ($this->availableRoles as $role)
-                    <flux:select.option value="{{ $role['value'] }}">{{ $role['label'] }}</flux:select.option>
-                @endforeach
-            </flux:select>
-        </div>
-
-        <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-            <flux:modal.close>
-                <flux:button variant="filled">{{ __('Cancel') }}</flux:button>
-            </flux:modal.close>
-            <flux:button variant="primary" type="submit" data-test="invite-submit">{{ __('Send invitation') }}</flux:button>
-        </div>
-    </form>
-</flux:modal>
+    </div>
+</div>

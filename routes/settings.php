@@ -29,4 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(EnsureTeamMembership::class)->group(function () {
         Route::livewire('settings/teams/{team}', 'pages::teams.edit')->name('teams.edit');
     });
+
+    Route::livewire('settings/users', 'pages::users.index')->name('users.index');
+    Route::livewire('settings/users/{user}', 'pages::users.edit')->name('users.edit');
+
+    Route::livewire('settings/roles', 'pages::roles.index')->name('roles.index');
+    Route::livewire('settings/roles/{role}', 'pages::roles.edit')->name('roles.edit');
 });

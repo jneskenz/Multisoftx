@@ -15,10 +15,22 @@
                         <i class="icon-base ti tabler-shield icon-md"></i>
                         <span>{{ __('Security') }}</span>
                     </a>
+                    <a href="{{ route('users.index') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('users.*') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-users icon-md"></i>
+                        <span>{{ __('Users') }}</span>
+                    </a>
+                    <a href="{{ route('roles.index') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('roles.*') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-shield icon-md"></i>
+                        <span>{{ __('Roles') }}</span>
+                    </a>
                     <a href="{{ route('teams.index') }}"
                        class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('teams.*') ? 'active' : '' }}"
                        wire:navigate>
-                        <i class="icon-base ti tabler-users icon-md"></i>
+                        <i class="icon-base ti tabler-building-community icon-md"></i>
                         <span>{{ __('Teams') }}</span>
                     </a>
                     <a href="{{ route('appearance.edit') }}"

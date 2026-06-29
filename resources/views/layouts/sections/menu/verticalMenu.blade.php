@@ -45,11 +45,31 @@
       </a>
     </li>
 
+    <!-- Users -->
+    @if (Route::has('users.index'))
+      <li class="menu-item {{ request()->routeIs('users.*') ? 'active open' : '' }}">
+        <a href="{{ route('users.index') }}" class="menu-link" wire:navigate>
+          <i class="menu-icon icon-base ti tabler-users"></i>
+          <div data-i18n="Users">{{ __('Usuarios') }}</div>
+        </a>
+      </li>
+    @endif
+
+    <!-- Roles -->
+    @if (Route::has('roles.index'))
+      <li class="menu-item {{ request()->routeIs('roles.*') ? 'active open' : '' }}">
+        <a href="{{ route('roles.index') }}" class="menu-link" wire:navigate>
+          <i class="menu-icon icon-base ti tabler-shield"></i>
+          <div data-i18n="Roles">{{ __('Roles') }}</div>
+        </a>
+      </li>
+    @endif
+
     <!-- Teams -->
-    @if (class_exists('App\Models\Team') && Route::has('teams.index'))
+    {{-- @if (class_exists('App\Models\Team') && Route::has('teams.index'))
       <li class="menu-item {{ request()->routeIs('teams.*') ? 'active open' : '' }}">
         <a href="javascript:void(0);" class="menu-link menu-toggle">
-          <i class="menu-icon icon-base ti tabler-users"></i>
+          <i class="menu-icon icon-base ti tabler-building-community"></i>
           <div data-i18n="Teams">{{ __('Teams') }}</div>
         </a>
         <ul class="menu-sub">
@@ -60,7 +80,7 @@
           </li>
         </ul>
       </li>
-    @endif
+    @endif --}}
 
     <!-- Modules -->
     @if (class_exists('Nwidart\Modules\Facades\Module'))
