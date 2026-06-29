@@ -26,7 +26,7 @@ Guia de inicializacion y referencia rapida del proyecto. Este archivo describe e
 | Gestion de modulos | nwidart/laravel-modules | Instalado |
 | Roles y permisos | spatie/laravel-permission | Instalado, migrado |
 | Auditoria | spatie/laravel-activitylog | Instalado, migrado |
-| Tests | Pest | 4.x |
+| Tests | Pest | 4.x (65 tests pasan, 2 skip, 1 risky) |
 
 Nota: `barryvdh/laravel-dompdf` esta documentado como necesidad futura, pero actualmente no esta instalado.
 
@@ -39,6 +39,21 @@ El Core/Shell Laravel gestiona autenticacion, equipos, usuarios, layout general,
 - `Modules/RRHH`
 
 Los modulos existen y estan activos, pero por ahora son stubs CRUD genericos generados por `nwidart/laravel-modules`. Todavia no implementan los MVP de negocio.
+
+Los tres modulos comparten la misma estructura generada por `nwidart/laravel-modules`:
+
+```
+Modules/{Module}/
+  app/
+    Providers/
+    Http/Controllers/
+  config/
+  database/
+  resources/views/
+  routes/
+  module.json
+  composer.json
+```
 
 Entidades compartidas previstas:
 
@@ -56,15 +71,15 @@ Entidades compartidas previstas:
 | `/settings/security` | Activa | Seguridad/2FA/passkeys UI parcial |
 | `/settings/appearance` | Activa | Apariencia |
 | `/settings/teams` | Activa | Equipos |
-| `/crms` | Activa | Stub CRUD CRM |
-| `/erps` | Activa | Stub CRUD ERP |
-| `/rrhhs` | Activa | Stub CRUD RRHH |
-| `/api/v1/crms` | Activa | Stub API CRM |
-| `/api/v1/erps` | Activa | Stub API ERP |
-| `/api/v1/rrhhs` | Activa | Stub API RRHH |
+| `/crm` | Activa | Stub CRUD CRM |
+| `/erp` | Activa | Stub CRUD ERP |
+| `/rrhh` | Activa | Stub CRUD RRHH |
+| `/api/v1/crm` | Activa | Stub API CRM |
+| `/api/v1/erp` | Activa | Stub API ERP |
+| `/api/v1/rrhh` | Activa | Stub API RRHH |
 | `/admin` | Pendiente | Administracion Core |
 
-Pendiente arquitectonico: decidir si los modulos deben conservar rutas genericas actuales (`/crms`, `/erps`, `/rrhhs`) o normalizarse a `/crm`, `/erp`, `/rrhh`.
+Las rutas de modulos estan normalizadas a singular: `/crm`, `/erp`, `/rrhh`.
 
 ## 5. Requisitos locales
 
@@ -118,6 +133,10 @@ Migraciones Core ejecutadas:
 - `teams`
 - `current_team_id` en `users`
 
+Migraciones 2FA:
+
+- `2026_06_18_220655_add_two_factor_columns_to_users_table.php` (agregada en Fase 0.5)
+
 Migraciones Spatie ejecutadas:
 
 - `2026_06_14_005050_create_permission_tables.php`
@@ -125,13 +144,7 @@ Migraciones Spatie ejecutadas:
 
 ## 9. Blockers tecnicos actuales
 
-1. Los tests fallan en este entorno porque falta `pdo_sqlite`:
-
-```text
-could not find driver (Connection: sqlite, Database: :memory:)
-```
-
-2. Vuexy esta integrado en el dashboard, pero el resto de layouts Flux/Livewire antiguos aun existen.
+1. Vuexy esta integrado en el dashboard, pero el resto de layouts Flux/Livewire antiguos aun existen.
 
 ## 10. Verificacion actual
 
@@ -152,7 +165,7 @@ Resultado:
 - `module:list`: CRM, ERP y RRHH activos.
 - `migrate:status`: todas las migraciones actuales ejecutadas.
 - `npm run build`: correcto.
-- `php artisan test`: bloqueado por falta de `pdo_sqlite`.
+- `php artisan test`: 65 passed, 2 skipped, 1 risky.
 - `php artisan view:cache`: correcto.
 
 ## 11. Convenciones vigentes
@@ -177,9 +190,10 @@ vendor/bin/pint --dirty --format agent
 - [x] Fase 0 - Ejecutar migraciones de Permission y Activitylog.
 - [x] Fase 0 - Resolver componente faltante de passkeys o desactivar UI incompleta.
 - [x] Fase 0 - Corregir rutas antiguas del dashboard.
-- [ ] Fase 0 - Habilitar entorno de tests.
-- [ ] Fase 1 - Consolidar layout maestro Vuexy.
-- [ ] Fase 1 - Menu dinamico por modulo.
+- [x] Fase 0.5 - Habilitar entorno de tests (65 de 67 tests pasando).
+- [x] Fase 0.5 - Unificar estructura PSR-4 de modulos (CRM, ERP, RRHH).
+- [x] Fase 1 - Consolidar layout maestro Vuexy (settings, equipos y pages internas ahora usan Vuexy).
+- [x] Fase 1 - Menu dinamico por modulo (sidebar lee modulos activos via Module::allEnabled()).
 - [ ] Fase 1 - Roles y permisos base.
 - [ ] Fase 2 - RRHH MVP.
 - [ ] Fase 3 - CRM MVP.

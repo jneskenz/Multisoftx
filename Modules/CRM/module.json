@@ -5,7 +5,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\CRM\\Providers\\CRMServiceProvider"
+        "Modules\\CRM\\App\\Providers\\CRMServiceProvider"
     ],
     "files": []
 }

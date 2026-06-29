@@ -18,6 +18,11 @@ test('security settings page can be rendered', function () {
 });
 
 test('security settings page requires password confirmation when enabled', function () {
+    $this->skipUnlessFortifyHas(
+        \Laravel\Fortify\Features::twoFactorAuthentication(),
+        'Two-factor authentication is not enabled.',
+    );
+
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)

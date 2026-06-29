@@ -40,7 +40,7 @@
               <li>
                 <a class="dropdown-item" href="{{ route('profile.edit') }}">
                   <i class="icon-base ti tabler-user me-3 icon-md"></i>
-                  <span>{{ __('Profile') }}</span>
+                  <span>{{ __('Perfil') }}</span>
                 </a>
               </li>
             @endif
@@ -49,7 +49,7 @@
                 @csrf
                 <button type="submit" class="dropdown-item">
                   <i class="icon-base ti tabler-logout me-3 icon-md"></i>
-                  <span>{{ __('Sign Out') }}</span>
+                  <span>{{ __('Cerrar Sesión') }}</span>
                 </button>
               </form>
             </li>

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\CRM\Http\Controllers\CRMController;
+use Modules\CRM\App\Http\Controllers\CRMController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('crms', CRMController::class)->names('crm');
+    Route::resource('crm', CRMController::class)->names('crm');
 });

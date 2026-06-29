@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CRM\Providers;
+namespace Modules\CRM\App\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 

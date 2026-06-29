@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\CRM\Providers;
+namespace Modules\CRM\App\Providers;
 
 use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;

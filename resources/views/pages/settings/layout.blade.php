@@ -1,21 +1,46 @@
-<div class="flex items-start max-md:flex-col">
-    <div class="me-10 w-full pb-4 md:w-[220px]">
-        <flux:navlist aria-label="{{ __('Settings') }}">
-            <flux:navlist.item :href="route('profile.edit')" wire:navigate>{{ __('Profile') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('security.edit')" wire:navigate>{{ __('Security') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('teams.index')" :current="request()->routeIs('teams.*')" wire:navigate>{{ __('Teams') }}</flux:navlist.item>
-            <flux:navlist.item :href="route('appearance.edit')" wire:navigate>{{ __('Appearance') }}</flux:navlist.item>
-        </flux:navlist>
+<div class="row">
+    <div class="col-md-3 col-12 mb-4">
+        <div class="card">
+            <div class="card-body p-2">
+                <div class="list-group list-group-flush">
+                    <a href="{{ route('profile.edit') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('profile.edit') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-user icon-md"></i>
+                        <span>{{ __('Profile') }}</span>
+                    </a>
+                    <a href="{{ route('security.edit') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('security.edit') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-shield icon-md"></i>
+                        <span>{{ __('Security') }}</span>
+                    </a>
+                    <a href="{{ route('teams.index') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('teams.*') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-users icon-md"></i>
+                        <span>{{ __('Teams') }}</span>
+                    </a>
+                    <a href="{{ route('appearance.edit') }}"
+                       class="list-group-item list-group-item-action d-flex align-items-center gap-3 {{ request()->routeIs('appearance.edit') ? 'active' : '' }}"
+                       wire:navigate>
+                        <i class="icon-base ti tabler-palette icon-md"></i>
+                        <span>{{ __('Appearance') }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <flux:separator class="md:hidden" />
-
-    <div class="flex-1 self-stretch max-md:pt-6">
-        <flux:heading>{{ $heading ?? '' }}</flux:heading>
-        <flux:subheading>{{ $subheading ?? '' }}</flux:subheading>
-
-        <div class="mt-5 w-full max-w-lg">
-            {{ $slot }}
+    <div class="col-md-9 col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ $heading ?? '' }}</h5>
+                <small class="text-muted">{{ $subheading ?? '' }}</small>
+            </div>
+            <div class="card-body">
+                {{ $slot }}
+            </div>
         </div>
     </div>
 </div>
