@@ -70,7 +70,9 @@ Entidades compartidas previstas:
 | `/settings/profile` | Activa | Perfil de usuario |
 | `/settings/security` | Activa | Seguridad/2FA/passkeys UI parcial |
 | `/settings/appearance` | Activa | Apariencia |
-| `/settings/teams` | Activa | Equipos |
+| `/teams` | Activa | Equipos (gestion) |
+| `/users` | Activa | Usuarios (gestion) |
+| `/roles` | Activa | Roles y permisos (gestion) |
 | `/crm` | Activa | Stub CRUD CRM |
 | `/erp` | Activa | Stub CRUD ERP |
 | `/rrhh` | Activa | Stub CRUD RRHH |
@@ -80,6 +82,7 @@ Entidades compartidas previstas:
 | `/admin` | Pendiente | Administracion Core |
 
 Las rutas de modulos estan normalizadas a singular: `/crm`, `/erp`, `/rrhh`.
+Las rutas de gestion (teams/users/roles) fueron movidas a `routes/management.php` y ahora viven fuera de `settings/*`.
 
 ## 5. Requisitos locales
 
@@ -144,7 +147,11 @@ Migraciones Spatie ejecutadas:
 
 ## 9. Blockers tecnicos actuales
 
-1. Vuexy esta integrado en el dashboard, pero el resto de layouts Flux/Livewire antiguos aun existen.
+1. Navbar superior aun mezcla enlaces demo de Vuexy (`pages-*.html`, `auth-login-cover.html`) con rutas reales Laravel.
+2. Falta cerrar el dropdown de usuario con acciones reales (perfil/configuracion/logout por rutas del sistema).
+3. Breadcrumbs nuevo (`resources/views/components/breadcrumbs.blade.php`) requiere limpieza de comentarios temporales.
+4. Vistas de roles/usuarios tienen copys cruzados (ej. textos de usuarios en pantallas de roles) pendientes de ajuste.
+5. Verificar si se requiere compatibilidad retroactiva para rutas antiguas `settings/users`, `settings/roles`, `settings/teams`.
 
 ## 10. Verificacion actual
 
@@ -194,7 +201,8 @@ vendor/bin/pint --dirty --format agent
 - [x] Fase 0.5 - Unificar estructura PSR-4 de modulos (CRM, ERP, RRHH).
 - [x] Fase 1 - Consolidar layout maestro Vuexy (settings, equipos y pages internas ahora usan Vuexy).
 - [x] Fase 1 - Menu dinamico por modulo (sidebar lee modulos activos via Module::allEnabled()).
-- [ ] Fase 1 - Roles y permisos base.
+- [ ] Fase 1 - Roles y permisos base (en progreso de UI/rutas, faltan ajustes finales de copy y navegacion).
+- [ ] Fase 1 - Navbar final productivo (reemplazar enlaces demo por rutas reales y logout funcional).
 - [ ] Fase 2 - RRHH MVP.
 - [ ] Fase 3 - CRM MVP.
 - [ ] Fase 4 - ERP MVP.

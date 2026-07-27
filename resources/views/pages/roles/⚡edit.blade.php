@@ -65,49 +65,87 @@ new class extends Component {
     {
         return $this->view()->title(__('Edit :name', ['name' => $this->role->name]));
     }
+
+    #[Computed]
+    public function breadcrumbs(): array
+    {
+        $items = [
+            ['name' => __('Roles y Permisos')],
+        ];
+
+        return [
+            'title' => 'Editar Roles y Permisos',
+            'description' => 'Gestión Administrativo de Roles y Permisos',
+            'icon' => 'ti tabler-users',
+            'items' => $items,
+        ];
+    }
+    
 }; ?>
 
 <section class="w-full">
-    <x-pages::settings.layout :heading="__('Edit role')" :subheading="$role->name">
-        <form wire:submit="savePermissions">
-            <div class="mb-3">
-                <label class="form-label fw-medium">{{ __('Role') }}</label>
-                <p class="form-control-plaintext">{{ $role->name }}</p>
-            </div>
 
-            <h5 class="mb-3">{{ __('Permissions') }}</h5>
-
-            @foreach ($this->groupedPermissions as $group => $perms)
-                <div class="card mb-3">
-                    <div class="card-header py-2">
-                        <h6 class="mb-0 text-capitalize">{{ $group }}</h6>
-                    </div>
-                    <div class="card-body py-2">
-                        <div class="row">
-                            @foreach ($perms as $perm)
-                                <div class="col-md-4 col-6 mb-1">
-                                    <div class="form-check">
-                                        <input type="checkbox" class="form-check-input" id="perm-{{ $perm->id }}"
-                                            wire:model="permissions.{{ $perm->name }}"
-                                            @if ($role->name === 'super-admin') disabled @endif />
-                                        <label class="form-check-label small" for="perm-{{ $perm->id }}">
-                                            {{ ucfirst(str_replace('-', ' ', explode('.', $perm->name)[1] ?? $perm->name)) }}
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
+    <x-breadcrumbs :items="$this->breadcrumbs">
+        {{-- <x-slot:extra>
             <div class="d-flex align-items-center gap-2">
-                <button type="submit" class="btn btn-primary" @if ($role->name === 'super-admin') disabled @endif>
-                    {{ __('Save permissions') }}
-                </button>
-                <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary" wire:navigate>{{ __('Back') }}</a>
+                
+                <span class="badge bg-label-info">
+                    <i class="ti tabler-users"></i>
+                </span>
             </div>
-        </form>
+        </x-slot:extra> --}}
+    </x-breadcrumbs>
+
+    <div class="col-md-12 col-12">
+        <div class="card">
+            <x-card-header title="{{ __('Registros de usuarios') }}" description="{{ __('Empleados con acceso a') }} {{ config('app.name') }}"
+                textColor="text-plus" icon="ti tabler-users" iconColor="bg-label-info">
+                {{-- <button class="btn btn-primary btn-md btn-md-normal px-1 px-md-3 waves-effect d-flex align-items-center"
+                    title="{{ __('Nuevo Rol') }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#create-role-modal">
+                    <i class="ti tabler-plus me-md-1"></i>
+                    <span class="d-none d-md-inline ms-1">{{ __('Nuevo Empleado') }}</span>
+                </button> --}}
+            </x-card-header>
+
+            <div class="card-body mt-5">    
+                <form wire:submit="savePermissions">
+
+                    @foreach ($this->groupedPermissions as $group => $perms)
+                        <div class="card shadow-none border mb-3">
+                            <div class="card-header py-2">
+                                <h6 class="mb-0 text-capitalize">{{ $group }}</h6>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="row">
+                                    @foreach ($perms as $perm)
+                                        <div class="col-md-2 col-6 mb-1">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="perm-{{ $perm->id }}"
+                                                    wire:model="permissions.{{ $perm->name }}"
+                                                    @if ($role->name === 'super-admin') disabled @endif />
+                                                <label class="form-check-label small" for="perm-{{ $perm->id }}">
+                                                    {{ ucfirst(str_replace('-', ' ', explode('.', $perm->name)[1] ?? $perm->name)) }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="submit" class="btn btn-primary" @if ($role->name === 'super-admin') disabled @endif>
+                            {{ __('Save permissions') }}
+                        </button>
+                        <a href="{{ route('roles.index') }}" class="btn btn-outline-secondary" wire:navigate>{{ __('Back') }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
         @if ($role->name !== 'super-admin')
             <hr class="my-4" />
@@ -145,5 +183,4 @@ new class extends Component {
                 </div>
             </div>
         @endif
-    </x-pages::settings.layout>
 </section>

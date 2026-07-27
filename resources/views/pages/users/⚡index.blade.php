@@ -62,9 +62,37 @@ new #[Title('Users')] class extends Component {
     {
         $this->resetPage();
     }
+
+    #[Computed]
+    public function breadcrumbs(): array
+    {
+        $items = [
+            ['name' => __('Usuarios')],
+        ];
+
+        return [
+            'title' => 'Gestión de Usuarios',
+            'description' => 'Gestión Administrativo de Usuarios',
+            'icon' => 'ti tabler-users',
+            'items' => $items,
+        ];
+    }
+
 }; ?>
 
 <section class="w-full">
+
+    <x-breadcrumbs :items="$this->breadcrumbs">
+        {{-- <x-slot:extra>
+            <div class="d-flex align-items-center gap-2">
+                
+                <span class="badge bg-label-info">
+                    <i class="ti tabler-users"></i>
+                </span>
+            </div>
+        </x-slot:extra> --}}
+    </x-breadcrumbs>
+
     <div class="col-md-12 col-12">
         <div class="card">
             {{-- // accesoateams --}}

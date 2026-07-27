@@ -45,82 +45,118 @@ new #[Title('Roles')] class extends Component {
             ->orderBy('name')
             ->get();
     }
+
+    #[Computed]
+    public function breadcrumbs(): array
+    {
+        $items = [
+            ['name' => __('Roles y Permisos')],
+        ];
+
+        return [
+            'title' => 'Gestión de Roles y Permisos',
+            'description' => 'Gestión Administrativo de Roles y Permisos',
+            'icon' => 'ti tabler-users',
+            'items' => $items,
+        ];
+    }
+
 }; ?>
 
 <section class="w-full">
-    <x-pages::settings.layout :heading="__('Roles')" :subheading="__('Manage roles and permissions')">
-        <div class="d-flex align-items-center justify-content-end mb-4">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-role-modal">
-                <i class="icon-base ti tabler-plus me-1"></i>
-                {{ __('New role') }}
-            </button>
-        </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>{{ __('Role') }}</th>
-                        <th>{{ __('Permissions') }}</th>
-                        <th>{{ __('Users') }}</th>
-                        <th>{{ __('Guard') }}</th>
-                        <th class="text-end">{{ __('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($this->roles as $role)
-                        <tr>
-                            <td>
-                                <span class="fw-medium">{{ $role->name }}</span>
-                                @if ($role->name === 'super-admin')
-                                    <span class="badge bg-label-warning ms-1">{{ __('Full access') }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge bg-label-primary">{{ $role->permissions->count() }}</span>
-                            </td>
-                            <td>
-                                <span class="badge bg-label-secondary">{{ $role->users->count() }}</span>
-                            </td>
-                            <td><code>{{ $role->guard_name }}</code></td>
-                            <td class="text-end">
-                                <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-icon btn-text-secondary" wire:navigate title="{{ __('Edit') }}">
-                                    <i class="icon-base ti tabler-pencil"></i>
-                                </a>
-                                @if ($role->name !== 'super-admin')
-                                    <button type="button" class="btn btn-sm btn-icon btn-text-danger"
-                                        data-bs-toggle="modal" data-bs-target="#delete-role-{{ $role->id }}"
-                                        title="{{ __('Delete') }}">
-                                        <i class="icon-base ti tabler-trash"></i>
-                                    </button>
+    <x-breadcrumbs :items="$this->breadcrumbs">
+        {{-- <x-slot:extra>
+            <div class="d-flex align-items-center gap-2">
+                
+                <span class="badge bg-label-info">
+                    <i class="ti tabler-users"></i>
+                </span>
+            </div>
+        </x-slot:extra> --}}
+    </x-breadcrumbs>
 
-                                    <div class="modal fade" id="delete-role-{{ $role->id }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered modal-sm">
-                                            <div class="modal-content">
-                                                <form wire:submit="deleteRole({{ $role->id }})">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">{{ __('Delete role') }}</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="col-md-12 col-12">
+        <div class="card">
+            <x-card-header title="{{ __('Registros de usuarios') }}" description="{{ __('Empleados con acceso a') }} {{ config('app.name') }}"
+                textColor="text-plus" icon="ti tabler-users" iconColor="bg-label-info">
+                <button class="btn btn-primary btn-md btn-md-normal px-1 px-md-3 waves-effect d-flex align-items-center"
+                    title="{{ __('Nuevo Rol') }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#create-role-modal">
+                    <i class="ti tabler-plus me-md-1"></i>
+                    <span class="d-none d-md-inline ms-1">{{ __('Nuevo Empleado') }}</span>
+                </button>
+            </x-card-header>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Role') }}</th>
+                                <th>{{ __('Permissions') }}</th>
+                                <th>{{ __('Users') }}</th>
+                                <th>{{ __('Guard') }}</th>
+                                <th class="text-end">{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($this->roles as $role)
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium">{{ $role->name }}</span>
+                                        @if ($role->name === 'super-admin')
+                                            <span class="badge bg-label-warning ms-1">{{ __('Full access') }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-primary">{{ $role->permissions->count() }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-label-secondary">{{ $role->users->count() }}</span>
+                                    </td>
+                                    <td><code>{{ $role->guard_name }}</code></td>
+                                    <td class="text-end">
+                                        <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-icon btn-text-secondary" wire:navigate title="{{ __('Edit') }}">
+                                            <i class="icon-base ti tabler-pencil"></i>
+                                        </a>
+                                        @if ($role->name !== 'super-admin')
+                                            <button type="button" class="btn btn-sm btn-icon btn-text-danger"
+                                                data-bs-toggle="modal" data-bs-target="#delete-role-{{ $role->id }}"
+                                                title="{{ __('Delete') }}">
+                                                <i class="icon-base ti tabler-trash"></i>
+                                            </button>
+
+                                            <div class="modal fade" id="delete-role-{{ $role->id }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-sm">
+                                                    <div class="modal-content">
+                                                        <form wire:submit="deleteRole({{ $role->id }})">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">{{ __('Delete role') }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body text-start">
+                                                                <p class="mb-0">{{ __('Are you sure you want to delete :name?', ['name' => $role->name]) }}</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                                                                <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
-                                                    <div class="modal-body text-start">
-                                                        <p class="mb-0">{{ __('Are you sure you want to delete :name?', ['name' => $role->name]) }}</p>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                                                        <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
-                                                    </div>
-                                                </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </x-pages::settings.layout>
+    </div>
 
     <div class="modal fade" id="create-role-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-sm">

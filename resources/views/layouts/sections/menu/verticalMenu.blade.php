@@ -66,21 +66,14 @@
     @endif
 
     <!-- Teams -->
-    {{-- @if (class_exists('App\Models\Team') && Route::has('teams.index'))
+    @if (class_exists('App\Models\Team') && Route::has('teams.index'))
       <li class="menu-item {{ request()->routeIs('teams.*') ? 'active open' : '' }}">
-        <a href="javascript:void(0);" class="menu-link menu-toggle">
+        <a href="{{ route('teams.index') }}" class="menu-link" wire:navigate>
           <i class="menu-icon icon-base ti tabler-building-community"></i>
-          <div data-i18n="Teams">{{ __('Teams') }}</div>
+          <div data-i18n="Teams">{{ __('Empresas') }}</div>
         </a>
-        <ul class="menu-sub">
-          <li class="menu-item">
-            <a href="{{ route('teams.index') }}" class="menu-link">
-              <div data-i18n="Teams">{{ __('Teams') }}</div>
-            </a>
-          </li>
-        </ul>
       </li>
-    @endif --}}
+    @endif
 
     <!-- Modules -->
     @if (class_exists('Nwidart\Modules\Facades\Module'))
