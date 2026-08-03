@@ -1,78 +1,66 @@
 <?php
 
-use App\Models\User;
 use Flux\Flux;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Livewire\WithPagination;
+use Spatie\Permission\Models\Role;
 
-new #[Title('Users')] class extends Component {
-    use WithPagination;
-
+new #[Title('Roles')] class extends Component {
     public string $name = '';
-    public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
 
-    public function createUser(): void
+    public function createRole(): void
     {
+        Gate::authorize('roles.create');
+
         $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => ['required', 'string', 'max:255', Rule::unique(Role::class)],
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+        Role::create(['name' => $validated['name'], 'guard_name' => 'web']);
 
-        $this->reset('name', 'email', 'password', 'password_confirmation');
+        $this->reset('name');
 
-        Flux::toast(variant: 'success', text: __('User created.'));
-
-        $this->redirectRoute('users.edit', $user, navigate: true);
+        Flux::toast(variant: 'success', text: __('Role created.'));
     }
 
-    public function deleteUser(int $id): void
+    public function deleteRole(int $id): void
     {
-        $user = User::findOrFail($id);
+        Gate::authorize('roles.delete');
 
-        if ($user->id === auth()->id()) {
-            Flux::toast(variant: 'danger', text: __('You cannot delete yourself.'));
+        $role = Role::findOrFail($id);
+
+        if ($role->name === 'super-admin') {
+            Flux::toast(variant: 'danger', text: __('Cannot delete super-admin role.'));
 
             return;
         }
 
-        $user->delete();
+        $role->delete();
 
-        Flux::toast(variant: 'success', text: __('User deleted.'));
+        Flux::toast(variant: 'success', text: __('Role deleted.'));
     }
 
     #[Computed]
-    public function users()
+    public function roles()
     {
-        return User::query()->orderBy('name')->paginate(10);
-    }
-
-    public function updatingSearch(): void
-    {
-        $this->resetPage();
+        return Role::query()
+            ->orderBy('name')
+            ->get();
     }
 
     #[Computed]
     public function breadcrumbs(): array
     {
         $items = [
-            ['name' => __('Usuarios')],
+            ['name' => __('Roles y Permisos')],
         ];
 
         return [
-            'title' => 'Gestión de Usuarios',
-            'description' => 'Gestión Administrativo de Usuarios',
+            'title' => 'Gestión de Roles y Permisos',
+            'description' => 'Gestión Administrativo de Roles y Permisos',
             'icon' => 'ti tabler-users',
             'items' => $items,
         ];
@@ -95,16 +83,17 @@ new #[Title('Users')] class extends Component {
 
     <div class="col-md-12 col-12">
         <div class="card">
-            {{-- // accesoateams --}}
             <x-card-header title="{{ __('Registros de usuarios') }}" description="{{ __('Empleados con acceso a') }} {{ config('app.name') }}"
                 textColor="text-plus" icon="ti tabler-users" iconColor="bg-label-info">
-                <button class="btn btn-primary btn-md btn-md-normal px-1 px-md-3 waves-effect d-flex align-items-center"
-                    title="{{ __('Nuevo Empleado') }}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#create-user-modal">
-                    <i class="ti tabler-plus me-md-1"></i>
-                    <span class="d-none d-md-inline ms-1">{{ __('Nuevo Empleado') }}</span>
-                </button>
+                @can('roles.create')
+                    <button class="btn btn-primary btn-md btn-md-normal px-1 px-md-3 waves-effect d-flex align-items-center"
+                        title="{{ __('Nuevo Rol') }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#create-role-modal">
+                        <i class="ti tabler-plus me-md-1"></i>
+                        <span class="d-none d-md-inline ms-1">{{ __('Nuevo Empleado') }}</span>
+                    </button>
+                @endcan
             </x-card-header>
 
             <div class="card-body">
@@ -112,126 +101,90 @@ new #[Title('Users')] class extends Component {
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>{{ __('Name') }}</th>
-                                <th>{{ __('Email') }}</th>
-                                <th>{{ __('Registered') }}</th>
+                                <th>{{ __('Role') }}</th>
+                                <th>{{ __('Permissions') }}</th>
+                                <th>{{ __('Users') }}</th>
+                                <th>{{ __('Guard') }}</th>
                                 <th class="text-end">{{ __('Actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($this->users as $user)
+                            @foreach ($this->roles as $role)
                                 <tr>
                                     <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle bg-label-primary"
-                                                style="width:34px;height:34px;font-weight:600;font-size:.8rem;color:#7367f0;">
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                                            </div>
-                                            <span class="fw-medium">{{ $user->name }}</span>
-                                        </div>
+                                        <span class="fw-medium">{{ $role->name }}</span>
+                                        @if ($role->name === 'super-admin')
+                                            <span class="badge bg-label-warning ms-1">{{ __('Full access') }}</span>
+                                        @endif
                                     </td>
-                                    <td>{{ $user->email }}</td>
                                     <td>
-                                        <small class="text-muted">{{ $user->created_at->format('d/m/Y') }}</small>
+                                        <span class="badge bg-label-primary">{{ $role->permissions->count() }}</span>
                                     </td>
+                                    <td>
+                                        <span class="badge bg-label-secondary">{{ $role->users->count() }}</span>
+                                    </td>
+                                    <td><code>{{ $role->guard_name }}</code></td>
                                     <td class="text-end">
-                                        <a href="{{ route('users.edit', $user) }}"
-                                            class="btn btn-sm btn-icon btn-text-secondary" wire:navigate
-                                            title="{{ __('Edit') }}">
+                                        <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-icon btn-text-secondary" wire:navigate title="{{ __('Edit') }}">
                                             <i class="icon-base ti tabler-pencil"></i>
                                         </a>
-                                        @if ($user->id !== auth()->id())
+                                        @can('roles.delete')
+                                            @if ($role->name !== 'super-admin')
                                             <button type="button" class="btn btn-sm btn-icon btn-text-danger"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#delete-user-{{ $user->id }}"
+                                                data-bs-toggle="modal" data-bs-target="#delete-role-{{ $role->id }}"
                                                 title="{{ __('Delete') }}">
                                                 <i class="icon-base ti tabler-trash"></i>
                                             </button>
 
-                                            <div class="modal fade" id="delete-user-{{ $user->id }}" tabindex="-1"
-                                                aria-hidden="true">
+                                            <div class="modal fade" id="delete-role-{{ $role->id }}" tabindex="-1" aria-hidden="true">
                                                 <div class="modal-dialog modal-dialog-centered modal-sm">
                                                     <div class="modal-content">
-                                                        <form wire:submit="deleteUser({{ $user->id }})">
+                                                        <form wire:submit="deleteRole({{ $role->id }})">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title">{{ __('Delete user') }}</h5>
-                                                                <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal"></button>
+                                                                <h5 class="modal-title">{{ __('Delete role') }}</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                             </div>
                                                             <div class="modal-body text-start">
-                                                                <p class="mb-0">
-                                                                    {{ __('Are you sure you want to delete :name?', ['name' => $user->name]) }}
-                                                                </p>
+                                                                <p class="mb-0">{{ __('Are you sure you want to delete :name?', ['name' => $role->name]) }}</p>
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-outline-secondary"
-                                                                    data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                                                                <button type="submit"
-                                                                    class="btn btn-danger">{{ __('Delete') }}</button>
+                                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                                                                <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
                                                             </div>
                                                         </form>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif
+                                            @endif
+                                        @endcan
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-
-                <div class="mt-3">
-                    {{ $this->users->links() }}
-                </div>
             </div>
         </div>
     </div>
 
-
-    <div class="modal fade" id="create-user-modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="create-role-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
             <div class="modal-content">
-                <form wire:submit="createUser">
+                <form wire:submit="createRole">
                     <div class="modal-header">
-                        <h5 class="modal-title">{{ __('Create user') }}</h5>
+                        <h5 class="modal-title">{{ __('Create role') }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="user-name" class="form-label">{{ __('Name') }}</label>
-                            <input type="text" id="user-name" class="form-control" wire:model="name" required
-                                autofocus />
-                            @error('name')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="user-email" class="form-label">{{ __('Email') }}</label>
-                            <input type="email" id="user-email" class="form-control" wire:model="email" required />
-                            @error('email')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="user-password" class="form-label">{{ __('Password') }}</label>
-                            <input type="password" id="user-password" class="form-control" wire:model="password"
-                                required />
-                            @error('password')
-                                <div class="text-danger small mt-1">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="mb-3">
-                            <label for="user-password-confirmation"
-                                class="form-label">{{ __('Confirm password') }}</label>
-                            <input type="password" id="user-password-confirmation" class="form-control"
-                                wire:model="password_confirmation" required />
+                            <label for="role-name" class="form-label">{{ __('Role name') }}</label>
+                            <input type="text" id="role-name" class="form-control" wire:model="name" required autofocus />
+                            @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                        <button type="submit" class="btn btn-primary">{{ __('Create user') }}</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('Create') }}</button>
                     </div>
                 </form>
             </div>

@@ -10,9 +10,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::livewire('teams/{team}', 'pages::teams.edit')->name('teams.edit');
     });
 
-    Route::livewire('users', 'pages::users.index')->name('users.index');
-    Route::livewire('users/{user}', 'pages::users.edit')->name('users.edit');
+    Route::middleware('can:roles.list')->group(function () {
+        Route::livewire('roles', 'pages::roles.index')->name('roles.index');
+    });
 
-    Route::livewire('roles', 'pages::roles.index')->name('roles.index');
-    Route::livewire('roles/{role}', 'pages::roles.edit')->name('roles.edit');
+    Route::middleware('can:roles.edit')->group(function () {
+        Route::livewire('roles/{role}', 'pages::roles.edit')->name('roles.edit');
+    });
 });
